@@ -32,8 +32,8 @@
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#060B19",
-        "monochromeImage": "./assets/images/adaptive-icon.png"
+        "backgroundColor": "#0A1128",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png"
       },
       "icon": "./assets/images/icon.png",
       "permissions": [
