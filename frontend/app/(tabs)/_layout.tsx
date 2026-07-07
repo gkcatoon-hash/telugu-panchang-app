@@ -4,13 +4,24 @@ import { Tabs } from "expo-router";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 
+const ANDROID_TAB_BAR_BASE = 60;
+const IOS_TAB_BAR_BASE = 50;
+
 export default function TabsLayout() {
   const { colors, isDark } = useTheme();
   const { t } = useLang();
+  const insets = useSafeAreaInsets();
+
+  // Android with edge-to-edge draws under the gesture bar — add insets.bottom
+  // so the labels/icons aren't hidden. iOS adds home-indicator safe area.
+  const bottomInset = insets.bottom;
+  const baseHeight = Platform.OS === "ios" ? IOS_TAB_BAR_BASE : ANDROID_TAB_BAR_BASE;
+  const tabBarHeight = baseHeight + bottomInset;
 
   const iconFor = (name: string, focused: boolean, color: string) => (
     <Ionicons name={name as any} size={focused ? 24 : 22} color={color} />
@@ -23,30 +34,45 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.brandPrimary,
         tabBarInactiveTintColor: isDark ? "#8892B0" : "#6B7A99",
         tabBarShowLabel: true,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginBottom: 4 },
+        tabBarHideOnKeyboard: true,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+        },
+        tabBarItemStyle: {
+          paddingTop: 6,
+          paddingBottom: Platform.OS === "android" ? 6 : 0,
+        },
         tabBarStyle: {
           position: "absolute",
           borderTopWidth: 0,
           elevation: 0,
-          height: Platform.OS === "ios" ? 84 : 68,
-          paddingTop: 8,
+          height: tabBarHeight,
+          paddingBottom: bottomInset,
+          paddingTop: 4,
           backgroundColor: "transparent",
         },
         tabBarBackground: () => (
           <View style={StyleSheet.absoluteFill}>
-            <BlurView
-              intensity={Platform.OS === "ios" ? 60 : 90}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
+            {Platform.OS === "ios" ? (
+              <BlurView
+                intensity={60}
+                tint={isDark ? "dark" : "light"}
+                style={StyleSheet.absoluteFill}
+              />
+            ) : null}
             <View
               style={[
                 StyleSheet.absoluteFill,
                 {
                   backgroundColor: isDark
-                    ? "rgba(6,11,25,0.85)"
-                    : "rgba(255,255,255,0.85)",
-                  borderTopWidth: 1,
+                    ? Platform.OS === "ios"
+                      ? "rgba(6,11,25,0.85)"
+                      : "rgba(6,11,25,0.98)"
+                    : Platform.OS === "ios"
+                    ? "rgba(255,255,255,0.85)"
+                    : "rgba(255,255,255,0.98)",
+                  borderTopWidth: StyleSheet.hairlineWidth,
                   borderTopColor: colors.border,
                 },
               ]}

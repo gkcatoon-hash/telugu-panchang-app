@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { slokaOfTheDay, SLOKAS, Sloka } from "@/src/data/slokas";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
+import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 const KRISHNA_IMG =
@@ -40,6 +41,7 @@ export default function DevotionScreen() {
   const { colors } = useTheme();
   const { t, lang } = useLang();
   const insets = useSafeAreaInsets();
+  const bottomPad = useTabBarBottomPadding();
   const [activeDeity, setActiveDeity] = useState<Sloka["deity"] | null>(null);
 
   const today = useMemo(() => new Date(), []);
@@ -54,7 +56,7 @@ export default function DevotionScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }} showsVerticalScrollIndicator={false}>
         {/* Hero Sloka card with Krishna image */}
         <View style={styles.hero}>
           <Image source={{ uri: KRISHNA_IMG }} style={StyleSheet.absoluteFill} contentFit="cover" />

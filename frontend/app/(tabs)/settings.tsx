@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PRESET_CITIES, useLocation } from "@/src/data/LocationContext";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
+import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 const NOTIF_KEY = "@manalife/notifications-enabled";
@@ -27,6 +28,7 @@ export default function SettingsScreen() {
   const { t, lang, setLang } = useLang();
   const { location, setLocation } = useLocation();
   const insets = useSafeAreaInsets();
+  const bottomPad = useTabBarBottomPadding();
 
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showLangSheet, setShowLangSheet] = useState(false);
@@ -90,7 +92,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>{t("tab_settings")}</Text>
         </View>

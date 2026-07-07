@@ -15,6 +15,7 @@ import { FESTIVALS_2026 } from "@/src/data/festivals";
 import { computePanchang } from "@/src/data/panchang";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
+import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 function daysInMonth(y: number, m: number) {
@@ -28,6 +29,7 @@ export default function CalendarScreen() {
   const { colors } = useTheme();
   const { t, lang } = useLang();
   const insets = useSafeAreaInsets();
+  const bottomPad = useTabBarBottomPadding();
 
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -83,7 +85,7 @@ export default function CalendarScreen() {
         <Text style={styles.title}>{t("tab_calendar")}</Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }} showsVerticalScrollIndicator={false}>
         <View style={styles.monthBar}>
           <Pressable onPress={() => changeMonth(-1)} style={styles.arrowBtn} testID="cal-prev-month">
             <Ionicons name="chevron-back" size={20} color={colors.brand} />

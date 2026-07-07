@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FESTIVALS_2026 } from "@/src/data/festivals";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
+import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 const HERO_IMG = "https://images.pexels.com/photos/38122489/pexels-photo-38122489.jpeg";
@@ -26,6 +27,7 @@ export default function FestivalsScreen() {
   const { colors } = useTheme();
   const { t, lang } = useLang();
   const insets = useSafeAreaInsets();
+  const bottomPad = useTabBarBottomPadding();
   const [filter, setFilter] = useState<Filter>("all");
 
   const items = useMemo(() => {
@@ -64,7 +66,7 @@ export default function FestivalsScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }} showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <View style={styles.hero}>
           <Image source={{ uri: HERO_IMG }} style={StyleSheet.absoluteFill} contentFit="cover" />

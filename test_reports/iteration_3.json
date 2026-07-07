@@ -1,0 +1,34 @@
+{
+  "summary": "P4 Android tab-bar / safe-area regression at viewport 412x915. FRONTEND (100%). All 5 bottom tabs render with icon+label at y=865, height=50, width≈82.4px each, bottom=915 (exactly at viewport edge — none clipped). Each tab is tappable and navigates: Home → Calendar (title 'Calendar', month-label 'July 2026' → 'August 2026' after next-month click) → Festivals (3 festival-chip-*) → Devotion (8 deity-chip-*) → Settings (4 rows). Home hero: app-brand at y=179 — well below any status-bar zone; hero image bleeds behind translucent status bar as intended, text never clipped. Home sunrise = 5:47 AM (Hyderabad default). All iteration_2 regression testIDs present: home-tithi-name, home-nakshatra, home-yoga, home-karana, home-vara, home-sunrise, home-sunset, home-rahukalam, home-yamagandam, home-gulika, home-next-festival, home-daily-quote, cal-prev-month, cal-next-month, cal-detail-card, cal-month-label, festival-chip-* (3), deity-chip-* (8), settings-dark-mode-switch, settings-language-row, settings-notif-switch, settings-location-row, lang-option-en, lang-option-te, loc-option-Hyderabad, loc-option-Vijayawada. Ionicons: document.fonts reports 'ionicons:loaded' (local /assets/fonts/Ionicons.ttf); all glyphs render correctly in screenshots (home, calendar, sparkles, flower, settings, sunny, moon, star, infinite, location, chevron). Language modal opens & switches en↔te (Telugu Devotion screen renders 'విష్ణు శ్లోకం' etc.). Scroll-to-bottom on every tab reaches the last card (home-daily-quote, cal-detail-card, Devotion mantras, Settings 'Om Namah Shivaya' footer) without being hidden by the tab bar because useTabBarBottomPadding() adds bottomTabBarHeight + 24 to ScrollView contentContainerStyle. Tab-bar background is opaque solid layer on Android (rgba(6,11,25,0.98) dark) — screenshots show no content bleed-through. No red-screen errors, no on-page error text. Deprecated packages detected: none. React Native issues detected: only pre-existing transitive 'props.pointerEvents is deprecated' warning (from BlurView/expo-router internals, non-blocking, unchanged from iteration_2).",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "pointerEvents prop (transitive)", "issue": "Console warning 'props.pointerEvents is deprecated. Use style.pointerEvents' — originates from BlurView / expo-router internals. Non-blocking, pre-existing from iteration_1/2."}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_3.json",
+    "/app/test_reports/screens/1_home_top.png",
+    "/app/test_reports/screens/2_home_bottom.png",
+    "/app/test_reports/screens/3_calendar.png",
+    "/app/test_reports/screens/4_festivals.png",
+    "/app/test_reports/screens/5_devotion.png",
+    "/app/test_reports/screens/6_settings.png"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "(tabs)/_layout.tsx correctly computes tabBarHeight = (Platform.OS==='ios'?50:60) + insets.bottom and applies paddingBottom: insets.bottom — tab bar rises above Android gesture nav. Verified via bounding boxes (bottom=915 at edge on web where insets.bottom=0; on real Android insets.bottom>0 will lift it further).",
+    "Android tabBarBackground uses opaque solid layer rgba(6,11,25,0.98) dark / rgba(255,255,255,0.98) light with hairline top border. BlurView correctly gated to iOS only — no Android BlurView perf hit.",
+    "use-tabbar-inset.ts wraps @react-navigation/bottom-tabs useBottomTabBarHeight() and adds +24 slack. Applied consistently in index.tsx (bottomPad=useTabBarBottomPadding()), calendar.tsx, settings.tsx via ScrollView contentContainerStyle={{paddingBottom: bottomPad}} — confirmed last item reachable on every tab.",
+    "Home hero uses insets.top + spacing.lg for paddingTop so brand text stays below status-bar despite translucent StatusBar + hero image bleed. Verified brand y=179 on 412x915."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "N/A (frontend-only iteration)", "frontend": "100%" },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Android hardening iteration 3 PASSED cleanly at 412x915. All 5 bottom tabs (tab-home, tab-calendar, tab-festivals, tab-devotion, tab-settings) render, are tappable, and navigate. useTabBarBottomPadding() prevents content from being hidden behind the absolute tab bar on every screen. Ionicons load from local /app/frontend/assets/fonts/Ionicons.ttf (document.fonts: 'ionicons:loaded'). LIMITATION OF WEB PREVIEW TESTING: web viewport has insets.bottom=0 so gesture-nav lift cannot be visually simulated in Playwright — but the code path (tabBarHeight = base + insets.bottom, paddingBottom: insets.bottom) is present and correct; on a real Pixel device with 3-button-nav-off, insets.bottom will be ~15-24dp and the tab bar will float above it. Only pre-existing warning: props.pointerEvents deprecation from a transitive dep (unchanged since iteration_1). No new regressions."
+}

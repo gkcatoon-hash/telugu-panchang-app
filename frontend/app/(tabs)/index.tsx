@@ -19,6 +19,7 @@ import { quoteOfTheDay, slokaOfTheDay } from "@/src/data/slokas";
 import { FESTIVALS_2026 } from "@/src/data/festivals";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
+import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 const HERO_DARK =
@@ -31,6 +32,7 @@ export default function HomeScreen() {
   const { t, lang } = useLang();
   const { location } = useLocation();
   const insets = useSafeAreaInsets();
+  const bottomPad = useTabBarBottomPadding();
 
   const today = useMemo(() => new Date(), []);
   const panchang = useMemo(() => computePanchang(today), [today]);
@@ -65,7 +67,7 @@ export default function HomeScreen() {
     <View style={styles.root}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: bottomPad }}
       >
         {/* HERO */}
         <View style={styles.hero}>
