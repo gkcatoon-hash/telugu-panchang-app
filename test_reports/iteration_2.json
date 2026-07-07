@@ -1,0 +1,40 @@
+{
+  "summary": "P3 security-hardening regression. FRONTEND (100%): All 5 tabs render at 390x844, all previously-tested testIDs still present (home-tithi-name=Saptami, home-nakshatra, home-yoga, home-karana, home-vara, home-sunrise=5:47 AM Hyderabad, home-sunset=6:54 PM, home-rahukalam, home-yamagandam, home-gulika, home-next-festival=Guru Purnima, home-daily-quote). Ionicons load from LOCAL bundle (document.fonts reports 'ionicons:loaded'); no jsdelivr/cdn references in DOM; screenshots confirm proper icon glyphs (moon, sun, calendar, home, star, flower, etc.) — no tofu boxes. Calendar next-month works (July -> August 2026). Festival/Devotion chips visible. Language switch to Telugu persists across reload (body: 'మన లైఫ్ … సప్తమి'). Location change Hyderabad -> Vijayawada updates sunrise 5:47 AM -> 5:40 AM. BACKEND (75%): /api/ returns 200 {status:'ok',service:'manalife-calendar'}; /api/status GET and POST both return 404 (endpoints removed as intended). App-level CORS is correctly configured (verified via direct localhost:8001 test — echoes exact allowed origin, rejects evil.example.com with HTTP 400). HOWEVER, the public preview URL is behind Cloudflare which injects 'Access-Control-Allow-Origin: *' at the edge, overriding FastAPI's explicit allow-list. This is an INFRASTRUCTURE-LAYER finding, not an app-code bug — the code satisfies the hardening spec. Deprecated packages check: none of the flagged ones (expo-av, expo-barcode-scanner, expo-background-fetch) are in package.json. react-native-webview successfully removed. Only pre-existing non-blocking warning: 'props.pointerEvents is deprecated' from a transitive lib (BlurView/expo-router). Deprecated packages detected: none.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "* (edge/ingress layer)", "issue": "Cloudflare in front of the preview URL injects wildcard 'Access-Control-Allow-Origin: *' and 'Access-Control-Allow-Headers: *' with methods 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH', which overrides FastAPI's explicit allow-list. FastAPI itself is configured correctly (localhost:8001 direct request echoes only 'https://telugu-panchang-app.preview.emergentagent.com' for allowed origin and rejects other origins with 400). This means the app-code hardening is a no-op at the public edge until Cloudflare/ingress CORS is disabled or aligned. Not fixable in app code — needs infra configuration."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "pointerEvents prop", "issue": "Console warning 'props.pointerEvents is deprecated. Use style.pointerEvents' still present — coming from a transitive dependency (BlurView / expo-router internals). Non-blocking, pre-existing from iteration_1."}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_2.json",
+    "/app/backend/tests/test_hardening.py",
+    "/app/test_reports/pytest/hardening_results.xml"
+  ],
+  "action_items": [
+    "INFRA (not app code): Investigate the Kubernetes ingress / Cloudflare configuration for this preview environment — it currently adds wildcard CORS at the edge, defeating the FastAPI allow-list. If the platform-level CORS cannot be disabled per-app, document this limitation. App code is otherwise correct.",
+    "Optional: track and silence the transitive 'pointerEvents' deprecation warning (pre-existing)."
+  ],
+  "critical_code_review_comments": [
+    "server.py CORS block is clean: no wildcard, allow_credentials=False, minimal methods (GET/POST/OPTIONS) and headers (Content-Type/Authorization). Uses CORS_ALLOWED_ORIGINS env with sensible default.",
+    "use-icon-fonts.ts correctly gates local font loading to ExecutionEnvironment.StoreClient (Expo Go) and no-ops elsewhere; require('../../assets/fonts/Ionicons.ttf') is a proper local bundle. Ionicons.ttf (~390KB) is present at /app/frontend/assets/fonts/Ionicons.ttf.",
+    "package.json confirmed does NOT contain react-native-webview; no remaining imports of 'react-native-webview' in /app/frontend/app or /app/frontend/src."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_hardening.py (new)"
+  ],
+  "success_rate": {"backend": "88% (7/8 acceptance items — 1 blocked by ingress-layer CORS override, not app code)", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "P3 hardening iteration. App-level FastAPI CORS is correct (direct test via http://localhost:8001/api/ with Origin=allowed echoes the exact origin; Origin=evil.example.com returns HTTP 400). The public preview URL passes through Cloudflare (Server: cloudflare header on responses) which unconditionally adds 'access-control-allow-origin: *' and wide method/header lists — this happens even for /api/ routes and overrides the FastAPI headers. This is an infra concern, not app code. All frontend testIDs from iteration_1 remain valid. Ionicons bundle at /app/frontend/assets/fonts/Ionicons.ttf renders correctly on web (font-family 'ionicons' status='loaded' in document.fonts). No CDN/jsdelivr references in DOM. Test suite location: /app/backend/tests/test_hardening.py (pytest, JUnit XML at /app/test_reports/pytest/hardening_results.xml).",
+  "rca_of_issue": "CORS wildcard on public URL: RCA — Cloudflare (edge) sets its own CORS response headers that override/replace FastAPI's, evidenced by 'Server: cloudflare' header + 'access-control-max-age: 300' + method list including PUT/DELETE/HEAD/PATCH which FastAPI never sends (FastAPI is configured for GET/POST/OPTIONS only and max-age=600). Reproduction: `curl -sI https://telugu-panchang-app.preview.emergentagent.com/api/ -H 'Origin: https://evil.example.com'` returns 'access-control-allow-origin: *'. Direct `curl -sI http://localhost:8001/api/ -H 'Origin: https://evil.example.com'` correctly omits ACAO. Mitigation: turn off Cloudflare-managed CORS for this hostname, or move CORS enforcement to a WAF rule that matches the FastAPI allow-list."
+}
