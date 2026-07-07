@@ -1,0 +1,206 @@
+{
+  "app_name": "ManaLife Calendar",
+  "personality": "6 Glass / Luxe (with 3 Editorial typography)",
+  "personality_one_liner": "A premium, devotional experience rooted in tradition but elevated through deep cinematic blue colors, gold accents, and elegant serif typography.",
+  "color": {
+    "light": {
+      "surface": "#F6F8FA",
+      "onSurface": "#0A1128",
+      "surfaceSecondary": "#FFFFFF",
+      "onSurfaceSecondary": "#151F38",
+      "surfaceTertiary": "#EAEFF5",
+      "onSurfaceTertiary": "#293A60",
+      "surfaceInverse": "#0A1128",
+      "onSurfaceInverse": "#FDF1D6",
+      "brand": "#D4AF37",
+      "brandPrimary": "#D4AF37",
+      "onBrandPrimary": "#0A1128",
+      "brandSecondary": "#B8860B",
+      "onBrandSecondary": "#FFFFFF",
+      "brandTertiary": "#FDF1D6",
+      "onBrandTertiary": "#8B6508",
+      "success": "#2D6A4F",
+      "onSuccess": "#D8F3DC",
+      "warning": "#B08D57",
+      "onWarning": "#FFF3E0",
+      "error": "#9B2226",
+      "onError": "#FFD6D6",
+      "info": "#005F73",
+      "onInfo": "#E0FBFC",
+      "border": "#E2E8F0",
+      "borderStrong": "#CBD5E1",
+      "divider": "#E2E8F0"
+    },
+    "dark": {
+      "surface": "#060B19",
+      "onSurface": "#F8F9FA",
+      "surfaceSecondary": "#0F1A3A",
+      "onSurfaceSecondary": "#EAEFF5",
+      "surfaceTertiary": "#1A264F",
+      "onSurfaceTertiary": "#D0D7E5",
+      "surfaceInverse": "#F8F9FA",
+      "onSurfaceInverse": "#060B19",
+      "brand": "#D4AF37",
+      "brandPrimary": "#D4AF37",
+      "onBrandPrimary": "#060B19",
+      "brandSecondary": "#E5C05C",
+      "onBrandSecondary": "#0A1128",
+      "brandTertiary": "#4B3B17",
+      "onBrandTertiary": "#FDF1D6",
+      "success": "#40916C",
+      "onSuccess": "#081C15",
+      "warning": "#D4AF37",
+      "onWarning": "#2A1F00",
+      "error": "#E63946",
+      "onError": "#450A0F",
+      "info": "#48CAE4",
+      "onInfo": "#03045E",
+      "border": "#1A264F",
+      "borderStrong": "#293A60",
+      "divider": "#1A264F"
+    }
+  },
+  "typography": {
+    "displayFontFamily": "Cormorant Garamond",
+    "textFontFamily": "Plus Jakarta Sans",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous editorial spacing. Let the typography and gold accents breathe on the deep blue surfaces.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "0",
+  "navigation": "bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": true,
+    "do's": [
+      "Use heavy glass on Bottom Tabs to let deep backgrounds bleed through.",
+      "Use glass layers for floating Panchang summary cards placed over hero temple imagery.",
+      "Use subtle glass over dark surfaces to elevate content."
+    ],
+    "dont's": [
+      "Don't stack glass on top of glass.",
+      "Don't use weak blur that harms readability."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "haptics": {
+    "events": {
+      "tab_press": "light",
+      "date_select": "selection",
+      "primary_action": "medium",
+      "toggle_switch": "light"
+    }
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "purpose": "At-a-glance dashboard showing today's Panchang timings, auspicious periods, and daily devotion.",
+      "states": {
+        "loading": "Centered gold spinner over deep blue background.",
+        "empty": "No data for today: graceful error with an illustration of a kalash and retry button.",
+        "error": "Unable to load Panchang data, tap to retry."
+      },
+      "layout": "Cinematic header (hero image with abstract gold/blue or temple architecture) with a gradient scrim (top to bottom). The large date and core Tithi text sit at the bottom of this hero block. Below the hero, use a 2-column card grid for Panchang details (Sunrise/Sunset, Rahukalam, Yamagandam, Gulika Kalam). End with a full-width featured Devotional Quote card."
+    },
+    {
+      "name": "Calendar",
+      "purpose": "A monthly Hindu calendar view marking tithis and vrathams.",
+      "states": {
+        "loading": "Skeleton of grid.",
+        "empty": "No calendar data.",
+        "error": "Failed to load calendar."
+      },
+      "layout": "Standard 7-column calendar grid taking the top half. Below it, a selected-date detail view structured as a scrollable list containing that day's tithi details and any festival info. Use clean sans-serif for numbers and elegant serif for Tithi names."
+    },
+    {
+      "name": "Festivals",
+      "purpose": "Upcoming Hindu festivals and Vratham details in a structured list.",
+      "states": {
+        "loading": "List skeletons.",
+        "empty": "Illustration of Ganesha with 'No upcoming festivals found'.",
+        "error": "Failed to load festivals."
+      },
+      "layout": "Editorial list layout. Month headers using display serif. Festival items should use horizontal list rows with small tinted icon containers (or thumbnail imagery) on the left, festival name in serif, and date in sans."
+    },
+    {
+      "name": "Devotion",
+      "purpose": "A hub for daily Slokas, deity content, and devotional messages.",
+      "states": {
+        "loading": "Spinner.",
+        "empty": "No devotional content.",
+        "error": "Failed to load."
+      },
+      "layout": "A masonry or large-card layout. Top card is 'Daily Sloka' with a background image of Lord Krishna and glassmorphism text overlay. Below are categories (Mantras, Stories, Deities) designed as surfaceSecondary cards with brandTertiary-tinted icons."
+    },
+    {
+      "name": "Settings",
+      "purpose": "User preferences including language and dark mode toggle.",
+      "states": {
+        "loading": "None.",
+        "empty": "None.",
+        "error": "None."
+      },
+      "layout": "Standard system settings layout using surfaceSecondary list rows. Toggles for Dark Mode, Language (Telugu/English), and Notifications."
+    }
+  ],
+  "images": {
+    "hero_home_bg": {
+      "url": "https://images.unsplash.com/photo-1646523773249-23fea630a7a5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGdvbGQlMjBhbmQlMjBibHVlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3ODMzOTk5MTR8MA&ixlib=rb-4.1.0&q=85",
+      "dark": "https://images.unsplash.com/photo-1643220505856-08067e86e995?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdvbGQlMjBhbmQlMjBibHVlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3ODMzOTk5MTR8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract premium gold and deep blue texture"
+    },
+    "hero_devotion_krishna": {
+      "url": "https://images.unsplash.com/photo-1641730259879-ad98e7db7bcb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxMb3JkJTIwS3Jpc2huYSUyMHBsYXlpbmclMjBmbHV0ZXxlbnwwfHx8fDE3ODIwMjMwNzF8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Lord Krishna statue playing flute in soft light"
+    },
+    "hero_festivals_temple": {
+      "url": "https://images.pexels.com/photos/38122489/pexels-photo-38122489.jpeg",
+      "alt": "Stunning colorful Hindu temple gopuram"
+    },
+    "empty_state_ganesha": {
+      "url": "https://images.pexels.com/photos/30346579/pexels-photo-30346579.jpeg",
+      "alt": "Gold Ganesha statue for devotional empty states"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly adhere to the Premium Blue and Gold theme explicitly requested by the user, utilizing the Glass / Luxe (6) personality.",
+    "Implement the app primarily targeting the 'dark' theme aesthetic as its premium look, but build out the 'light' theme gracefully utilizing the provided tokens.",
+    "Use Cormorant Garamond (or similar elegant Display Serif) for Telugu terminology (Tithi, Nakshatram), Festival Names, and Quotes, paired with Plus Jakarta Sans for UI elements and numbers.",
+    "For the Home screen Hero section, use the 'hero_home_bg' image with a strict gradient scrim (transparent to surfaceInverse) to ensure text readability over the image.",
+    "Do NOT use pure blue or indigo for interactive elements; use the Antique Gold (brand) for primary actions, selected states, and important highlights to create the 'Blue and Gold' luxe contrast.",
+    "Every screen with list items or cards should utilize subtle surface colors, avoiding heavy borders or drop shadows. Rely on spacing and background color separation.",
+    "Implement 'Telugu' vs 'English' text strings cleanly. Ensure the chosen fonts support the Telugu script gracefully, or fallback to system UI serif.",
+    "Remember to implement the Haptics block for all major interactions like changing tabs or selecting a calendar date."
+  ]
+}
