@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,6 +9,7 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).parent
+STATIC_DIR = ROOT_DIR / "static"
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection (kept for future use; app currently runs fully offline)
@@ -25,10 +27,14 @@ async def root():
     return {"status": "ok", "service": "manalife-calendar"}
 
 
+@api_router.get("/privacy")
+async def privacy_policy():
+    return FileResponse(STATIC_DIR / "privacy.html", media_type="text/html")
+
+
 app.include_router(api_router)
 
 # Explicit allow-list — no wildcard, no credentials.
-# Only the app's own preview / production domains are allowed to hit the API.
 _allowed_origins_env = os.environ.get("CORS_ALLOWED_ORIGINS")
 if _allowed_origins_env:
     ALLOWED_ORIGINS = [o.strip() for o in _allowed_origins_env.split(",") if o.strip()]

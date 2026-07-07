@@ -1,24 +1,44 @@
 {
   "expo": {
     "name": "ManaLife Calendar",
-    "slug": "frontend",
+    "slug": "manalife-calendar",
     "version": "1.0.0",
+    "description": "Premium offline-first Telugu Panchang & Hindu devotional calendar. Daily Tithi, Nakshatram, Rahukalam, Yamagandam, Gulika Kalam, Sunrise/Sunset, Hindu festivals, Vratham details, daily slokas and devotional quotes — with English and Telugu language support.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "manalife",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "primaryColor": "#D4AF37",
+    "backgroundColor": "#060B19",
+    "privacy": "public",
+    "githubUrl": "",
+    "notification": {
+      "icon": "./assets/images/adaptive-icon.png",
+      "color": "#D4AF37"
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.emergent.telugupanchangapp.ej8384"
+      "bundleIdentifier": "com.emergent.telugupanchangapp.ej8384",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleDisplayName": "ManaLife Calendar",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.emergent.telugupanchangapp.ej8384",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#060B19"
+        "backgroundColor": "#060B19",
+        "monochromeImage": "./assets/images/adaptive-icon.png"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.emergent.telugupanchangapp.ej8384"
+      "icon": "./assets/images/icon.png",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +51,7 @@
       [
         "expo-notifications",
         {
+          "icon": "./assets/images/adaptive-icon.png",
           "color": "#D4AF37"
         }
       ],
@@ -38,14 +59,22 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-image.png",
-          "imageWidth": 200,
+          "imageWidth": 220,
           "resizeMode": "contain",
-          "backgroundColor": "#060B19"
+          "backgroundColor": "#060B19",
+          "dark": {
+            "image": "./assets/images/splash-image.png",
+            "backgroundColor": "#060B19"
+          }
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "privacyPolicyUrl": "https://telugu-panchang-app.preview.emergentagent.com/api/privacy",
+      "supportEmail": "support@manalife-calendar.app"
     }
   }
 }
