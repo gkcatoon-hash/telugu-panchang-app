@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only smoke + integration test of the ManaLife Calendar Expo Router app at mobile viewport 390x844. All 8 acceptance scenarios from the request pass: Home renders full Panchang (tithi/nakshatra/yoga/karana/vara), sunrise/sunset, Rahu/Yama/Gulika, next-festival, and daily-quote+sloka; bottom-tab navigation works for all 5 tabs; Calendar month grid + prev/next month + day selection + detail card work (July -> August 2026 confirmed); Festivals chips filter (18 -> 2 for vratham) works; Devotion deity chips filter slokas (Ganesha -> 1) works; Settings dark-mode toggle, language modal (English/Telugu), location modal (8 cities incl. Hyderabad, Vijayawada) all work. Language persistence via AsyncStorage confirmed — after switching to Telugu and page reload, brand still shows 'మన లైఫ్'. Location change (Hyderabad -> Vijayawada) correctly updated Home sunrise 5:47 AM -> 5:40 AM. Panchang math sanity passes: Hyderabad sunrise 5:47 AM (in expected 05:30–06:30 window), sunset 6:54 PM; Rahukalam 3:37 PM–5:16 PM and Yamagandam 9:04 AM–10:42 AM do NOT overlap and both fall between sunrise and sunset; Tithi 'Saptami' is a valid name from the 30-tithi list. Notifications toggle exists and no crash on web (expo-notifications logs an expected 'not fully supported on web' warning). No red screen, no runtime pageerror.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "pointerEvents prop (RN deprecation)", "issue": "Console warns: 'props.pointerEvents is deprecated. Use style.pointerEvents'. Likely coming from a third-party library (BlurView / expo-router internals). Non-blocking but should be tracked."}
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_1.json"],
+  "action_items": [
+    "No functional fixes required. Optionally investigate the pointerEvents deprecation warning source (probably a transitive lib) — safe to defer.",
+    "Consider verifying festival-dot rendering explicitly on 2026-03-19 (Ugadi) and 2026-11-08 (Deepavali) via automated tests in a future iteration; the current run navigated only into Jul/Aug 2026."
+  ],
+  "critical_code_review_comments": [
+    "Home screen file /app/frontend/app/(tabs)/index.tsx is 550 lines including a large StyleSheet — acceptable but nearing the 700-line soft limit; may be worth extracting <PanchangTile/> and <KalamRow/> plus their styles into their own files if the file grows further.",
+    "panchang.ts sunrise/sunset uses Meeus NOAA algo directly with JD at 12:00 UTC and returns a Date derived from base-of-day UTC + hoursUTC; for Hyderabad it produces 5:47 AM IST which is realistic. Good.",
+    "Kalam sequences RAHU_PART/YAMA_PART/GULIKA_PART correctly indexed by getDay() (0=Sun) — matches the Sunday-first arrays."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only)", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "App is an offline-first Expo Router mobile app served via web preview at https://telugu-panchang-app.preview.emergentagent.com/. No backend. Use viewport 390x844. AsyncStorage persists language/theme/location. Notifications no-op on web (permission may be denied — do NOT flag). Telugu glyphs render fine in Chromium here. Home testIDs: home-tithi-name, home-nakshatra, home-yoga, home-karana, home-vara, home-sunrise, home-sunset, home-rahukalam, home-yamagandam, home-gulika, home-next-festival, home-daily-quote, app-brand. Tabs: tab-home/calendar/festivals/devotion/settings. Calendar: cal-prev-month, cal-next-month, cal-month-label, cal-day-YYYY-MM-DD, cal-detail-card. Festivals: festival-chip-all/festival/vratham, festival-item-<id>. Devotion: deity-chip-all/Ganesha/Krishna/Rama/..., sloka-<id>. Settings: settings-dark-mode-switch, settings-language-row, settings-location-row, settings-notif-switch, lang-option-en/te, loc-option-<City>.",
+  "rca_of_issue": "N/A — no functional issues found in this iteration."
+}

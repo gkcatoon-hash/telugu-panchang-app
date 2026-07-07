@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "ManaLife Calendar",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#060B19"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.emergent.telugupanchangapp.ej8384"
@@ -27,13 +27,20 @@
     },
     "plugins": [
       "expo-router",
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "color": "#D4AF37"
+        }
+      ],
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#060B19"
         }
       ]
     ],
