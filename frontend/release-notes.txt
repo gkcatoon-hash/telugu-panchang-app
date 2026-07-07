@@ -1,0 +1,13 @@
+ManaLife Calendar v1.0.0 — Initial release
+
+• Daily Panchang: Tithi, Nakshatram, Vara, Yoga, Karana
+• Rahukalam, Yamagandam, Gulika Kalam for 8 preset cities
+• Accurate Sunrise & Sunset
+• Monthly Hindu calendar with festival dots
+• 18 curated 2026 festivals & vrathams
+• 7 daily slokas (Ganesha, Krishna, Rama, Shiva, Devi, Vishnu, Hanuman)
+• Daily devotional quote
+• English & Telugu language support
+• Premium blue-and-gold dark & light themes
+• Optional daily 6:30 AM Panchang reminder
+• 100% offline — no login, no ads, no tracking

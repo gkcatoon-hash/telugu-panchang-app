@@ -11,8 +11,6 @@
     "newArchEnabled": true,
     "primaryColor": "#D4AF37",
     "backgroundColor": "#060B19",
-    "privacy": "public",
-    "githubUrl": "",
     "notification": {
       "icon": "./assets/images/adaptive-icon.png",
       "color": "#D4AF37"

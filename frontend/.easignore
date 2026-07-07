@@ -1,0 +1,23 @@
+# Files/dirs excluded from the EAS build upload (relative to /app/frontend/).
+# Keep the mobile build tarball lean.
+
+# Local caches
+.metro-cache/
+.expo/
+node_modules/.cache/
+
+# Intermediate AI-generation artifacts (final assets are referenced by app.json)
+assets/images/adaptive-icon-source.png
+assets/images/splash-source.png
+assets/images/feature-graphic-source.png
+assets/images/icon-source.png
+assets/images/emblem-transparent.png
+assets/images/app-image.png
+assets/images/partial-react-logo.png
+assets/images/react-logo.png
+assets/images/react-logo@2x.png
+assets/images/react-logo@3x.png
+
+# Docs (not needed on-device)
+README.md
+README-EAS.md
