@@ -35,6 +35,7 @@
       },
       "icon": "./assets/images/icon.png",
       "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
         "android.permission.POST_NOTIFICATIONS"
       ]
     },
@@ -72,7 +73,17 @@
     },
     "extra": {
       "privacyPolicyUrl": "https://telugu-panchang-app.preview.emergentagent.com/api/privacy",
-      "supportEmail": "support@manalife-calendar.app"
+      "supportEmail": "support@manalife-calendar.app",
+      "router": {},
+      "eas": {
+        "projectId": "74fff87b-77b0-4655-9e99-df5bd98ab9c6"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/74fff87b-77b0-4655-9e99-df5bd98ab9c6"
     }
   }
 }

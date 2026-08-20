@@ -35,6 +35,8 @@ export const strings = {
   yamagandam: { en: "Yamagandam", te: "యమగండం" },
   gulika: { en: "Gulika Kalam", te: "గుళిక కాలం" },
   abhijit: { en: "Abhijit Muhurta", te: "అభిజిత్ ముహూర్తం" },
+  ends_at: { en: "Ends at", te: "ముగిసే సమయం" },
+  yama: { en: "Yama (Yamagandam)", te: "యమ (యమగండం)" },
 
   // Paksha
   shukla: { en: "Shukla Paksha", te: "శుక్ల పక్షం" },
@@ -66,6 +68,9 @@ export const strings = {
   notifications: { en: "Daily Notifications", te: "నిత్య నోటిఫికేషన్‌లు" },
   notifications_desc: { en: "Get today's Panchang each morning", te: "ప్రతి ఉదయం నేటి పంచాంగం అందుకోండి" },
   location: { en: "Location", te: "ప్రదేశం" },
+  location_desc: { en: "Use your current position for sunrise and festival timings", te: "సూర్యోదయం మరియు పండుగ సమయాల కోసం మీ ప్రస్తుత స్థానం వాడండి" },
+  detect_location: { en: "Detect current location", te: "ప్రస్తుత స్థానం కనుగొనండి" },
+  detecting: { en: "Detecting…", te: "కనుగొంటోంది…" },
   about: { en: "About", te: "గురించి" },
   version: { en: "Version", te: "వెర్షన్" },
 

@@ -12,11 +12,15 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FESTIVALS_2026 } from "@/src/data/festivals";
-import { computePanchang } from "@/src/data/panchang";
+import { computePanchang, computeSunTimes, computeKalams, formatTime } from "@/src/data/panchang";
+import { useLocation } from "@/src/data/LocationContext";
+import { storage } from "@/src/utils/storage";
 import { useLang } from "@/src/i18n/LanguageContext";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
+import { toLocalDateKey } from "@/src/utils/date";
 
 function daysInMonth(y: number, m: number) {
   return new Date(y, m + 1, 0).getDate();
@@ -49,12 +53,22 @@ export default function CalendarScreen() {
   }, [year, month]);
 
   const selectedPanchang = useMemo(() => computePanchang(selected), [selected]);
+  const { location } = useLocation();
+  const sunTimes = useMemo(() => computeSunTimes(selected, location.lat, location.lon), [selected, location]);
+  const kalams = useMemo(() => (sunTimes.sunrise && sunTimes.sunset ? computeKalams(sunTimes.sunrise, sunTimes.sunset, selected.getDay()) : null), [sunTimes, selected]);
+  const [festivals, setFestivals] = React.useState<typeof FESTIVALS_2026>(FESTIVALS_2026);
+  React.useEffect(() => {
+    (async () => {
+      const cached = await storage.getItem("@manalife/festivals", FESTIVALS_2026);
+      setFestivals(cached ?? FESTIVALS_2026);
+    })();
+  }, []);
   const festivalMap = useMemo(() => {
     const m = new Map<string, (typeof FESTIVALS_2026)[number]>();
-    for (const f of FESTIVALS_2026) m.set(f.date, f);
+    for (const f of festivals) m.set(f.date, f);
     return m;
-  }, []);
-  const selectedIso = selected.toISOString().slice(0, 10);
+  }, [festivals]);
+  const selectedIso = toLocalDateKey(selected);
   const selectedFestival = festivalMap.get(selectedIso);
 
   const monthLabel = new Date(year, month, 1).toLocaleDateString(
@@ -66,6 +80,8 @@ export default function CalendarScreen() {
     lang === "te"
       ? ["ఆది", "సోమ", "మంగ", "బుధ", "గురు", "శుక్ర", "శని"]
       : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const router = useRouter();
 
   const changeMonth = (delta: number) => {
     Haptics.selectionAsync().catch(() => {});
@@ -109,7 +125,7 @@ export default function CalendarScreen() {
         <View style={styles.grid}>
           {grid.map((d, i) => {
             if (!d) return <View key={i} style={styles.cell} />;
-            const iso = d.toISOString().slice(0, 10);
+          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             const hasFestival = festivalMap.has(iso);
             const isToday =
               d.toDateString() === today.toDateString();
@@ -120,9 +136,10 @@ export default function CalendarScreen() {
                 key={i}
                 style={styles.cell}
                 onPress={() => {
-                  Haptics.selectionAsync().catch(() => {});
-                  setSelected(d);
-                }}
+                    Haptics.selectionAsync().catch(() => {});
+                    const iso = d.toISOString().slice(0, 10);
+                    router.push(`/day/${iso}`);
+                  }}
                 testID={`cal-day-${iso}`}
               >
                 <View
@@ -175,18 +192,28 @@ export default function CalendarScreen() {
                   selectedPanchang.tithi.paksha === "shukla" ? "శుక్ల" : "కృష్ణ"
                 )})
               </Text>
+              <Text style={styles.detailSub}>
+                {"  "}
+                {t("ends_at")}: {formatTime(selectedPanchang.tithi.endsAt, location.tz)}
+              </Text>
             </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t("nakshatra")}</Text>
             <Text style={styles.detailValue}>
               {pick(selectedPanchang.nakshatra.nameEn, selectedPanchang.nakshatra.nameTe)}
+              <Text style={styles.detailSub}>
+                {"  "}{t("ends_at")}:{" "}{formatTime(selectedPanchang.nakshatra.endsAt, location.tz)}
+              </Text>
             </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t("yoga")}</Text>
             <Text style={styles.detailValue}>
               {pick(selectedPanchang.yoga.nameEn, selectedPanchang.yoga.nameTe)}
+              <Text style={styles.detailSub}>
+                {"  "}{t("ends_at")}:{" "}{formatTime(selectedPanchang.yoga.endsAt, location.tz)}
+              </Text>
             </Text>
           </View>
           <View style={styles.detailRow}>
@@ -203,6 +230,36 @@ export default function CalendarScreen() {
           </View>
 
           <View style={styles.divider} />
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>{t("sunrise")}</Text>
+            <Text style={styles.detailValue}>{formatTime(sunTimes.sunrise, location.tz)}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>{t("sunset")}</Text>
+            <Text style={styles.detailValue}>{formatTime(sunTimes.sunset, location.tz)}</Text>
+          </View>
+          {kalams ? (
+            <>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t("rahukalam")}</Text>
+                <Text style={styles.detailValue}>
+                  {formatTime(kalams.rahu.start, location.tz)} - {formatTime(kalams.rahu.end, location.tz)}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t("yama")}</Text>
+                <Text style={styles.detailValue}>
+                  {formatTime(kalams.yama.start, location.tz)} - {formatTime(kalams.yama.end, location.tz)}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t("gulika")}</Text>
+                <Text style={styles.detailValue}>
+                  {formatTime(kalams.gulika.start, location.tz)} - {formatTime(kalams.gulika.end, location.tz)}
+                </Text>
+              </View>
+            </>
+          ) : null}
           {selectedFestival ? (
             <View>
               <Text style={styles.festivalBadge}>{t("festival")}</Text>

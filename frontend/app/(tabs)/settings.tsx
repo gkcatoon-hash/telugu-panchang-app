@@ -19,6 +19,7 @@ import { PRESET_CITIES, useLocation } from "@/src/data/LocationContext";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
+import { scheduleDailyPanchangNotification } from "@/src/notifications/notifications";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
 
 const NOTIF_KEY = "@manalife/notifications-enabled";
@@ -26,7 +27,7 @@ const NOTIF_KEY = "@manalife/notifications-enabled";
 export default function SettingsScreen() {
   const { colors, isDark, setMode } = useTheme();
   const { t, lang, setLang } = useLang();
-  const { location, setLocation } = useLocation();
+  const { location, setLocation, refreshLocation, isDetecting, error } = useLocation();
   const insets = useSafeAreaInsets();
   const bottomPad = useTabBarBottomPadding();
 
@@ -63,29 +64,19 @@ export default function SettingsScreen() {
             return;
           }
         }
-        await Notifications.cancelAllScheduledNotificationsAsync();
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: lang === "te" ? "నేటి పంచాంగం" : "Today's Panchang",
-            body:
-              lang === "te"
-                ? "నేటి తిథి, నక్షత్రం మరియు శుభ ముహూర్తాలను చూడండి."
-                : "Check today's Tithi, Nakshatram and auspicious timings.",
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-            hour: 6,
-            minute: 30,
-            repeats: true,
-          } as any,
-        });
+        await scheduleDailyPanchangNotification(location.lat, location.lon, location.tz);
       } else {
         await Notifications.cancelAllScheduledNotificationsAsync();
       }
-    } catch (e) {
-      // Silently handle Expo Go limitations
-      console.log("Notification setup skipped:", e);
+    } catch {
+      setNotifEnabled(false);
+      AsyncStorage.setItem(NOTIF_KEY, "0").catch(() => {});
     }
+  };
+
+  const handleDetectLocation = async () => {
+    Haptics.selectionAsync().catch(() => {});
+    await refreshLocation();
   };
 
   const styles = makeStyles(colors);
@@ -156,12 +147,28 @@ export default function SettingsScreen() {
             colors={colors}
             icon="location-outline"
             label={location.name}
-            subtitle={`${location.lat.toFixed(2)}°, ${location.lon.toFixed(2)}°`}
+            subtitle={
+              error
+                ? error
+                : isDetecting
+                ? t("detecting")
+                : `${location.lat.toFixed(2)}°, ${location.lon.toFixed(2)}°`
+            }
             onPress={() => {
               Haptics.selectionAsync().catch(() => {});
               setShowLocSheet(true);
             }}
             testID="settings-location-row"
+            chevron
+          />
+          <Divider colors={colors} />
+          <Row
+            colors={colors}
+            icon="locate-outline"
+            label={t("detect_location")}
+            subtitle={t("location_desc")}
+            onPress={handleDetectLocation}
+            testID="settings-detect-location"
             chevron
           />
         </View>

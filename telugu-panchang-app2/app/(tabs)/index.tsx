@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   SafeAreaView,
@@ -17,10 +16,24 @@ type InfoCardProps = {
   fullWidth?: boolean;
 };
 
-function InfoCard({ label, value, icon, accent, fullWidth = false }: InfoCardProps) {
+function InfoCard({
+  label,
+  value,
+  icon,
+  accent,
+  fullWidth = false,
+}: InfoCardProps) {
   return (
-    <View style={[styles.card, fullWidth ? styles.fullWidthCard : styles.halfWidthCard]}>
-     <View style={[styles.iconCircle, { backgroundColor: accent + '18' }]}>
+    <View
+      style={[
+        styles.card,
+        fullWidth ? styles.fullWidthCard : styles.halfWidthCard,
+      ]}>
+      <View
+        style={[
+          styles.iconCircle,
+          { backgroundColor: accent + '18' },
+        ]}>
         <Text style={styles.iconText}>{icon}</Text>
       </View>
 
@@ -34,6 +47,7 @@ function InfoCard({ label, value, icon, accent, fullWidth = false }: InfoCardPro
 
 function HomeScreen() {
   const today = new Date();
+
   const formattedDate = today.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -44,6 +58,7 @@ function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F7EED7" />
+
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>🕉️ తెలుగు పంచాంగం</Text>
@@ -58,12 +73,42 @@ function HomeScreen() {
         </View>
 
         <View style={styles.cardsWrap}>
-          <InfoCard label="తిథి" value="పంచమి" icon="🌙" accent="#8B0000" />
-          <InfoCard label="నక్షత్రం" value="ఉత్తరాషాఢం" icon="⭐" accent="#C96A00" />
-          <InfoCard label="రాహుకాలం" value="11:30 - 01:00" icon="⏰" accent="#7C3AED" />
-          <InfoCard label="యమగండం" value="08:30 - 10:00" icon="🪔" accent="#0F766E" />
-          <InfoCard label="సూర్యోదయం" value="05:48 AM" icon="☀️" accent="#D97706" />
-          <InfoCard label="సూర్యాస్తమయం" value="06:42 PM" icon="🌇" accent="#2563EB" />
+          <InfoCard
+            label="తిథి"
+            value="పంచమి"
+            icon="🌙"
+            accent="#8B0000"
+          />
+          <InfoCard
+            label="నక్షత్రం"
+            value="ఉత్తరాషాఢం"
+            icon="⭐"
+            accent="#C96A00"
+          />
+          <InfoCard
+            label="రాహుకాలం"
+            value="11:30 - 01:00"
+            icon="⏰"
+            accent="#7C3AED"
+          />
+          <InfoCard
+            label="యమగండం"
+            value="08:30 - 10:00"
+            icon="🪔"
+            accent="#0F766E"
+          />
+          <InfoCard
+            label="సూర్యోదయం"
+            value="05:48 AM"
+            icon="☀️"
+            accent="#D97706"
+          />
+          <InfoCard
+            label="సూర్యాస్తమయం"
+            value="06:42 PM"
+            icon="🌇"
+            accent="#2563EB"
+          />
           <InfoCard
             label="ఈ రోజు శ్లోకం"
             value="కర్మణ్యేవాధికారస్తే మా ఫలేషు కదాచన"

@@ -6,7 +6,7 @@ export type Festival = {
   date: string; // ISO
   nameEn: string;
   nameTe: string;
-  kind: "festival" | "vratham";
+  kind: "festival" | "vratham" | "observance";
   descriptionEn: string;
   descriptionTe: string;
 };
