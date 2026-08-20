@@ -14,14 +14,16 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FESTIVALS_2026 } from "@/src/data/festivals";
+import { storage } from "@/src/utils/storage";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
+import { toLocalDateKey } from "@/src/utils/date";
 
 const HERO_IMG = "https://images.pexels.com/photos/38122489/pexels-photo-38122489.jpeg";
 
-type Filter = "all" | "festival" | "vratham";
+type Filter = "all" | "festival" | "vratham" | "observance";
 
 export default function FestivalsScreen() {
   const { colors } = useTheme();
@@ -29,10 +31,20 @@ export default function FestivalsScreen() {
   const insets = useSafeAreaInsets();
   const bottomPad = useTabBarBottomPadding();
   const [filter, setFilter] = useState<Filter>("all");
+  const [festivals, setFestivals] = useState<typeof FESTIVALS_2026>(FESTIVALS_2026);
+
+  React.useEffect(() => {
+    (async () => {
+      const cached = await storage.getItem("@manalife/festivals", FESTIVALS_2026);
+      setFestivals(cached ?? FESTIVALS_2026);
+      // If cache was missing, persist the bundled data for offline use
+      await storage.setItem("@manalife/festivals", cached ?? FESTIVALS_2026);
+    })();
+  }, []);
 
   const items = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    const sorted = [...FESTIVALS_2026].sort((a, b) => a.date.localeCompare(b.date));
+    const today = toLocalDateKey(new Date());
+    const sorted = [...festivals].sort((a, b) => a.date.localeCompare(b.date));
     const upcoming = sorted.filter((f) => f.date >= today);
     const past = sorted.filter((f) => f.date < today);
     const full = [...upcoming, ...past]; // upcoming first, then past for reference
@@ -62,6 +74,7 @@ export default function FestivalsScreen() {
     { key: "all", label: pick("All", "అన్నీ") },
     { key: "festival", label: t("festival") },
     { key: "vratham", label: t("vratham") },
+    { key: "observance", label: t("observance") },
   ];
 
   return (

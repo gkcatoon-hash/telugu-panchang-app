@@ -1,5 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ExpoLocation from "expo-location";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { scheduleDailyPanchangNotification } from "@/src/notifications/notifications";
 
 export type Location = {
   name: string;
@@ -24,31 +26,75 @@ const STORAGE_KEY = "@manalife/location";
 type Ctx = {
   location: Location;
   setLocation: (l: Location) => void;
+  refreshLocation: () => Promise<void>;
+  isDetecting: boolean;
+  error: string | null;
 };
 
 const LocationContext = createContext<Ctx | undefined>(undefined);
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const [location, setLocationState] = useState<Location>(PRESET_CITIES[0]);
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const applyLocation = useCallback((next: Location) => {
+    setLocationState(next);
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
+    scheduleDailyPanchangNotification(next.lat, next.lon, next.tz).catch(() => {});
+  }, []);
+
+  const refreshLocation = useCallback(async () => {
+    setIsDetecting(true);
+    setError(null);
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.lat && parsed?.lon && parsed?.name) {
+          applyLocation(parsed);
+          setIsDetecting(false);
+          return;
+        }
+      }
+
+      const { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setError("Location permission not granted.");
+        return;
+      }
+
+      const pos = await ExpoLocation.getCurrentPositionAsync({ accuracy: ExpoLocation.Accuracy.Low });
+      const rev = await ExpoLocation.reverseGeocodeAsync({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      });
+      const place = rev && rev.length > 0 ? rev[0] : null;
+      const name = place?.city || place?.region || "Current Location";
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
+      const detected = {
+        name,
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        tz,
+      } satisfies Location;
+      applyLocation(detected);
+    } catch {
+      setError("Unable to detect your location right now.");
+    } finally {
+      setIsDetecting(false);
+    }
+  }, [applyLocation]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed?.lat && parsed?.lon && parsed?.name) setLocationState(parsed);
-        }
-      } catch {}
-    })();
-  }, []);
+    refreshLocation().catch(() => {});
+  }, [refreshLocation]);
 
   const setLocation = useCallback((l: Location) => {
-    setLocationState(l);
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(l)).catch(() => {});
-  }, []);
+    applyLocation(l);
+  }, [applyLocation]);
 
-  const value = useMemo(() => ({ location, setLocation }), [location, setLocation]);
+  const value = useMemo(() => ({ location, setLocation, refreshLocation, isDetecting, error }), [location, setLocation, refreshLocation, isDetecting, error]);
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
 }
 

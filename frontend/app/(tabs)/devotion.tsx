@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { slokaOfTheDay, SLOKAS, Sloka } from "@/src/data/slokas";
+import { storage } from "@/src/utils/storage";
 import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
@@ -26,7 +27,7 @@ const DEITY_META: {
   key: Sloka["deity"];
   labelEn: string;
   labelTe: string;
-  icon: keyof typeof import("@expo/vector-icons/Ionicons").glyphMap;
+  icon: React.ComponentProps<typeof Ionicons>["name"];
 }[] = [
   { key: "Ganesha", labelEn: "Ganesha", labelTe: "గణపతి", icon: "flower" },
   { key: "Krishna", labelEn: "Krishna", labelTe: "కృష్ణుడు", icon: "musical-notes" },
@@ -43,13 +44,32 @@ export default function DevotionScreen() {
   const insets = useSafeAreaInsets();
   const bottomPad = useTabBarBottomPadding();
   const [activeDeity, setActiveDeity] = useState<Sloka["deity"] | null>(null);
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+  const [showFavOnly, setShowFavOnly] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const daily = useMemo(() => slokaOfTheDay(today), [today]);
   const filteredSlokas = useMemo(
-    () => (activeDeity ? SLOKAS.filter((s) => s.deity === activeDeity) : SLOKAS),
-    [activeDeity]
+    () => {
+      const base = activeDeity ? SLOKAS.filter((s) => s.deity === activeDeity) : SLOKAS;
+      if (showFavOnly) return base.filter((s) => favorites[s.id]);
+      return base;
+    },
+    [activeDeity, favorites, showFavOnly]
   );
+
+  React.useEffect(() => {
+    (async () => {
+      const fav = await storage.getItem("@manalife/fav-slokas", {} as Record<string, boolean>);
+      setFavorites(fav || {});
+    })();
+  }, []);
+
+  const toggleFav = async (id: string) => {
+    const next = { ...favorites, [id]: !favorites[id] };
+    setFavorites(next);
+    await storage.setItem("@manalife/fav-slokas", next);
+  };
 
   const styles = makeStyles(colors);
   const pick = (en: string, te: string) => (lang === "te" ? te : en);
@@ -96,6 +116,19 @@ export default function DevotionScreen() {
                 {pick("All", "అన్నీ")}
               </Text>
             </Pressable>
+            <Pressable
+              onPress={() => {
+                Haptics.selectionAsync().catch(() => {});
+                setShowFavOnly((s) => !s);
+              }}
+              style={[styles.deityChip, showFavOnly && styles.deityChipActive]}
+              testID="deity-chip-favorites"
+            >
+              <Ionicons name={showFavOnly ? "heart" : "heart-outline"} size={14} color={showFavOnly ? colors.onBrandPrimary : colors.brand} />
+              <Text style={[styles.deityText, showFavOnly && styles.deityTextActive]}>
+                {pick("Favorites", "వచ్చెనివి")}
+              </Text>
+            </Pressable>
             {DEITY_META.map((d) => {
               const active = activeDeity === d.key;
               return (
@@ -125,8 +158,13 @@ export default function DevotionScreen() {
             <View key={s.id} style={styles.slokaCard} testID={`sloka-${s.id}`}>
               <View style={styles.slokaHeader}>
                 <Text style={styles.slokaTitle}>{pick(s.titleEn, s.titleTe)}</Text>
-                <View style={styles.deityBadge}>
-                  <Text style={styles.deityBadgeText}>{s.deity}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <View style={styles.deityBadge}>
+                    <Text style={styles.deityBadgeText}>{s.deity}</Text>
+                  </View>
+                  <Pressable onPress={() => toggleFav(s.id)} testID={`sloka-fav-${s.id}`}>
+                    <Ionicons name={favorites[s.id] ? "heart" : "heart-outline"} size={20} color={favorites[s.id] ? "#E91E63" : colors.brand} />
+                  </Pressable>
                 </View>
               </View>
               <Text style={styles.slokaSanskrit}>{s.sanskrit}</Text>

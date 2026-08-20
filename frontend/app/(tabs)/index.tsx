@@ -1,12 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import {
   Platform,
-  Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -21,6 +19,7 @@ import { useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
+import { toLocalDateKey } from "@/src/utils/date";
 
 const HERO_DARK =
   "https://images.unsplash.com/photo-1643220505856-08067e86e995?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdvbGQlMjBhbmQlMjBibHVlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3ODMzOTk5MTR8MA&ixlib=rb-4.1.0&q=85";
@@ -34,27 +33,33 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const bottomPad = useTabBarBottomPadding();
 
-  const today = useMemo(() => new Date(), []);
-  const panchang = useMemo(() => computePanchang(today), [today]);
+  const [now, setNow] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const panchang = useMemo(() => computePanchang(now), [now]);
   const { sunrise, sunset } = useMemo(
-    () => computeSunTimes(today, location.lat, location.lon),
-    [today, location.lat, location.lon]
+    () => computeSunTimes(now, location.lat, location.lon),
+    [now, location.lat, location.lon]
   );
   const kalams = useMemo(() => {
     if (!sunrise || !sunset) return null;
     return computeKalams(sunrise, sunset, panchang.vara.index);
   }, [sunrise, sunset, panchang.vara.index]);
 
-  const sloka = useMemo(() => slokaOfTheDay(today), [today]);
-  const quote = useMemo(() => quoteOfTheDay(today), [today]);
+  const sloka = useMemo(() => slokaOfTheDay(now), [now]);
+  const quote = useMemo(() => quoteOfTheDay(now), [now]);
   const nextFestival = useMemo(() => {
-    const now = today.toISOString().slice(0, 10);
-    return FESTIVALS_2026.find((f) => f.date >= now);
-  }, [today]);
+    const iso = toLocalDateKey(now);
+    return FESTIVALS_2026.find((f) => f.date >= iso);
+  }, [now]);
 
   const pick = (en: string, te: string) => (lang === "te" ? te : en);
 
-  const dateLabel = today.toLocaleDateString(lang === "te" ? "te-IN" : "en-IN", {
+  const dateLabel = now.toLocaleDateString(lang === "te" ? "te-IN" : "en-IN", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -111,7 +116,7 @@ export default function HomeScreen() {
             <PanchangTile
               label={t("nakshatra")}
               value={pick(panchang.nakshatra.nameEn, panchang.nakshatra.nameTe)}
-              subtext={`${pick("till", "వరకు")} ${formatTime(panchang.nakshatra.endsAt)}`}
+                subtext={`${pick("till", "వరకు")} ${formatTime(panchang.nakshatra.endsAt, location.tz)}`}
               icon="star-outline"
               testID="home-nakshatra"
               colors={colors}
@@ -119,7 +124,7 @@ export default function HomeScreen() {
             <PanchangTile
               label={t("yoga")}
               value={pick(panchang.yoga.nameEn, panchang.yoga.nameTe)}
-              subtext={`${pick("till", "వరకు")} ${formatTime(panchang.yoga.endsAt)}`}
+                subtext={`${pick("till", "వరకు")} ${formatTime(panchang.yoga.endsAt, location.tz)}`}
               icon="infinite-outline"
               testID="home-yoga"
               colors={colors}
@@ -148,7 +153,7 @@ export default function HomeScreen() {
               <Ionicons name="sunny" size={22} color={colors.brand} />
               <Text style={styles.sunLabel}>{t("sunrise")}</Text>
               <Text style={styles.sunTime} testID="home-sunrise">
-                {formatTime(sunrise)}
+                {formatTime(sunrise, location.tz)}
               </Text>
             </View>
             <View style={styles.sunDivider} />
@@ -156,7 +161,7 @@ export default function HomeScreen() {
               <Ionicons name="moon" size={22} color={colors.brand} />
               <Text style={styles.sunLabel}>{t("sunset")}</Text>
               <Text style={styles.sunTime} testID="home-sunset">
-                {formatTime(sunset)}
+                {formatTime(sunset, location.tz)}
               </Text>
             </View>
             <View style={styles.sunDivider} />
@@ -547,5 +552,3 @@ const makeStyles = (colors: any) =>
     },
   });
 
-void StatusBar; // suppress unused
-void Pressable;
