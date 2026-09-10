@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "ManaLife Calendar",
-    "slug": "manalife-calendar",
-    "version": "1.0.0",
-    "description": "Premium offline-first Telugu Panchang & Hindu devotional calendar. Daily Tithi, Nakshatram, Rahukalam, Yamagandam, Gulika Kalam, Sunrise/Sunset, Hindu festivals, Vratham details, daily slokas and devotional quotes — with English and Telugu language support.",
+    "name": "GKVG Calendar",
+    "slug": "gkvg-calendar",
+    "version": "2.0.0",
+    "description": "GKVG Calendar - Telugu Panchang, Hindu festivals, daily devotion, Tithi, Nakshatram, Rahukalam, Yamagandam, Gulika Kalam, Sunrise/Sunset and more.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "manalife",
+    "scheme": "gkvgcalendar",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "primaryColor": "#D4AF37",
@@ -18,15 +18,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.emergent.telugupanchangapp.ej8384",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
-        "CFBundleDisplayName": "ManaLife Calendar",
+        "CFBundleDisplayName": "GKVG Calendar",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.emergent.telugupanchangapp.ej8384",
-      "versionCode": 1,
+      "versionCode": 2,
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
