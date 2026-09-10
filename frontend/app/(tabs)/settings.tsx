@@ -19,7 +19,12 @@ import { PRESET_CITIES, useLocation } from "@/src/data/LocationContext";
 import { Language, useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
-import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
+import {
+  fonts,
+  fontSize,
+  radius,
+  spacing,
+} from "@/src/theme/tokens";
 
 const NOTIF_KEY = "@manalife/notifications-enabled";
 
@@ -27,6 +32,7 @@ export default function SettingsScreen() {
   const { colors, isDark, setMode } = useTheme();
   const { t, lang, setLang } = useLang();
   const { location, setLocation } = useLocation();
+
   const insets = useSafeAreaInsets();
   const bottomPad = useTabBarBottomPadding();
 
@@ -37,8 +43,8 @@ export default function SettingsScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const v = await AsyncStorage.getItem(NOTIF_KEY);
-        setNotifEnabled(v === "1");
+        const value = await AsyncStorage.getItem(NOTIF_KEY);
+        setNotifEnabled(value === "1");
       } catch {}
     })();
   }, []);
@@ -52,18 +58,28 @@ export default function SettingsScreen() {
     Haptics.selectionAsync().catch(() => {});
     setNotifEnabled(next);
 
-    AsyncStorage.setItem(NOTIF_KEY, next ? "1" : "0").catch(() => {});
+    AsyncStorage.setItem(
+      NOTIF_KEY,
+      next ? "1" : "0"
+    ).catch(() => {});
 
     try {
       if (next) {
-        const perm = await Notifications.getPermissionsAsync();
+        const permission =
+          await Notifications.getPermissionsAsync();
 
-        if (perm.status !== "granted") {
-          const req = await Notifications.requestPermissionsAsync();
+        if (permission.status !== "granted") {
+          const request =
+            await Notifications.requestPermissionsAsync();
 
-          if (req.status !== "granted") {
+          if (request.status !== "granted") {
             setNotifEnabled(false);
-            AsyncStorage.setItem(NOTIF_KEY, "0").catch(() => {});
+
+            AsyncStorage.setItem(
+              NOTIF_KEY,
+              "0"
+            ).catch(() => {});
+
             return;
           }
         }
@@ -76,7 +92,9 @@ export default function SettingsScreen() {
             body: t("notification_body"),
           },
           trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+            type:
+              Notifications.SchedulableTriggerInputTypes
+                .CALENDAR,
             hour: 6,
             minute: 30,
             repeats: true,
@@ -85,8 +103,11 @@ export default function SettingsScreen() {
       } else {
         await Notifications.cancelAllScheduledNotificationsAsync();
       }
-    } catch (e) {
-      console.log("Notification setup skipped:", e);
+    } catch (error) {
+      console.log(
+        "Notification setup skipped:",
+        error
+      );
     }
   };
 
@@ -94,12 +115,16 @@ export default function SettingsScreen() {
     switch (lang) {
       case "te":
         return t("telugu");
+
       case "hi":
         return t("hindi");
+
       case "ta":
         return t("tamil");
+
       case "kn":
         return t("kannada");
+
       case "en":
       default:
         return t("english");
@@ -109,13 +134,22 @@ export default function SettingsScreen() {
   const styles = makeStyles(colors);
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.root,
+        { paddingTop: insets.top },
+      ]}
+    >
       <ScrollView
-        contentContainerStyle={{ paddingBottom: bottomPad }}
+        contentContainerStyle={{
+          paddingBottom: bottomPad,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{t("tab_settings")}</Text>
+          <Text style={styles.title}>
+            {t("tab_settings")}
+          </Text>
         </View>
 
         {/* Appearance */}
@@ -137,7 +171,9 @@ export default function SettingsScreen() {
                   false: colors.borderStrong,
                 }}
                 thumbColor={
-                  Platform.OS === "android" ? "#fff" : undefined
+                  Platform.OS === "android"
+                    ? "#fff"
+                    : undefined
                 }
                 testID="settings-dark-mode-switch"
               />
@@ -180,7 +216,9 @@ export default function SettingsScreen() {
                   false: colors.borderStrong,
                 }}
                 thumbColor={
-                  Platform.OS === "android" ? "#fff" : undefined
+                  Platform.OS === "android"
+                    ? "#fff"
+                    : undefined
                 }
                 testID="settings-notif-switch"
               />
@@ -198,7 +236,9 @@ export default function SettingsScreen() {
             colors={colors}
             icon="location-outline"
             label={location.name}
-            subtitle={`${location.lat.toFixed(2)}°, ${location.lon.toFixed(2)}°`}
+            subtitle={`${location.lat.toFixed(
+              2
+            )}°, ${location.lon.toFixed(2)}°`}
             onPress={() => {
               Haptics.selectionAsync().catch(() => {});
               setShowLocSheet(true);
@@ -236,43 +276,60 @@ export default function SettingsScreen() {
         </Text>
       </ScrollView>
 
-      {/* Language picker */}
+      {/* Language Picker */}
       <PickerModal
         visible={showLangSheet}
         title={t("language")}
         colors={colors}
         onClose={() => setShowLangSheet(false)}
         options={[
-          { key: "en", label: t("english") },
-          { key: "te", label: t("telugu") },
-          { key: "hi", label: t("hindi") },
-          { key: "ta", label: t("tamil") },
-          { key: "kn", label: t("kannada") },
+          {
+            key: "en",
+            label: t("english"),
+          },
+          {
+            key: "te",
+            label: t("telugu"),
+          },
+          {
+            key: "hi",
+            label: t("hindi"),
+          },
+          {
+            key: "ta",
+            label: t("tamil"),
+          },
+          {
+            key: "kn",
+            label: t("kannada"),
+          },
         ]}
         selectedKey={lang}
-        onSelect={(k) => {
-          setLang(k as Language);
+        onSelect={(key) => {
+          setLang(key as Language);
           setShowLangSheet(false);
         }}
         testIDPrefix="lang-option"
       />
 
-      {/* Location picker */}
+      {/* Location Picker */}
       <PickerModal
         visible={showLocSheet}
         title={t("location")}
         colors={colors}
         onClose={() => setShowLocSheet(false)}
-        options={PRESET_CITIES.map((c) => ({
-          key: c.name,
-          label: c.name,
+        options={PRESET_CITIES.map((city) => ({
+          key: city.name,
+          label: city.name,
         }))}
         selectedKey={location.name}
-        onSelect={(k) => {
-          const c = PRESET_CITIES.find((x) => x.name === k);
+        onSelect={(key) => {
+          const city = PRESET_CITIES.find(
+            (item) => item.name === key
+          );
 
-          if (c) {
-            setLocation(c);
+          if (city) {
+            setLocation(city);
           }
 
           setShowLocSheet(false);
@@ -334,7 +391,10 @@ function Row({
       <View
         style={[
           rowStyles.iconWrap,
-          { backgroundColor: colors.brandTertiary },
+          {
+            backgroundColor:
+              colors.brandTertiary,
+          },
         ]}
       >
         <Ionicons
@@ -374,7 +434,9 @@ function Row({
           style={{
             color: colors.onSurfaceTertiary,
             fontSize: fontSize.base,
-            marginRight: chevron ? spacing.xs : 0,
+            marginRight: chevron
+              ? spacing.xs
+              : 0,
           }}
         >
           {value}
@@ -398,17 +460,27 @@ function Row({
       <Pressable
         onPress={onPress}
         testID={testID}
-        android_ripple={{ color: colors.divider }}
+        android_ripple={{
+          color: colors.divider,
+        }}
       >
         {content}
       </Pressable>
     );
   }
 
-  return <View testID={testID}>{content}</View>;
+  return (
+    <View testID={testID}>
+      {content}
+    </View>
+  );
 }
 
-function Divider({ colors }: { colors: any }) {
+function Divider({
+  colors,
+}: {
+  colors: any;
+}) {
   return (
     <View
       style={{
@@ -432,9 +504,12 @@ function PickerModal({
 }: {
   visible: boolean;
   title: string;
-  options: { key: string; label: string }[];
+  options: {
+    key: string;
+    label: string;
+  }[];
   selectedKey: string;
-  onSelect: (k: string) => void;
+  onSelect: (key: string) => void;
   onClose: () => void;
   colors: any;
   testIDPrefix: string;
@@ -453,7 +528,10 @@ function PickerModal({
         <Pressable
           style={[
             modalStyles.sheet,
-            { backgroundColor: colors.surfaceSecondary },
+            {
+              backgroundColor:
+                colors.surfaceSecondary,
+            },
           ]}
         >
           <View style={modalStyles.handle} />
@@ -462,7 +540,8 @@ function PickerModal({
             style={[
               modalStyles.title,
               {
-                color: colors.onSurfaceSecondary,
+                color:
+                  colors.onSurfaceSecondary,
                 fontFamily: fonts.display,
               },
             ]}
@@ -470,35 +549,41 @@ function PickerModal({
             {title}
           </Text>
 
-          {options.map((o) => {
-            const selected = selectedKey === o.key;
+          {options.map((option) => {
+            const selected =
+              selectedKey === option.key;
 
             return (
               <Pressable
-                key={o.key}
+                key={option.key}
                 onPress={() => {
-                  Haptics.selectionAsync().catch(() => {});
-                  onSelect(o.key);
+                  Haptics.selectionAsync().catch(
+                    () => {}
+                  );
+                  onSelect(option.key);
                 }}
                 style={[
                   modalStyles.option,
-                  { borderColor: colors.border },
+                  {
+                    borderColor: colors.border,
+                  },
                   selected && {
                     borderColor: colors.brand,
                     backgroundColor:
                       "rgba(212,175,55,0.10)",
                   },
                 ]}
-                testID={`${testIDPrefix}-${o.key}`}
+                testID={`${testIDPrefix}-${option.key}`}
               >
                 <Text
                   style={{
-                    color: colors.onSurfaceSecondary,
+                    color:
+                      colors.onSurfaceSecondary,
                     fontSize: fontSize.lg,
                     fontWeight: "600",
                   }}
                 >
-                  {o.label}
+                  {option.label}
                 </Text>
 
                 {selected && (
@@ -524,6 +609,7 @@ const rowStyles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
   },
+
   iconWrap: {
     width: 36,
     height: 36,
@@ -540,12 +626,14 @@ const modalStyles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
+
   sheet: {
     padding: spacing.xl,
     paddingBottom: spacing.xxl + 20,
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,
   },
+
   handle: {
     width: 40,
     height: 4,
@@ -554,10 +642,12 @@ const modalStyles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: spacing.lg,
   },
+
   title: {
     fontSize: fontSize.xl,
     marginBottom: spacing.lg,
   },
+
   option: {
     flexDirection: "row",
     alignItems: "center",
@@ -576,18 +666,22 @@ const makeStyles = (colors: any) =>
       flex: 1,
       backgroundColor: colors.surface,
     },
+
     header: {
       paddingHorizontal: spacing.xl,
       paddingVertical: spacing.lg,
     },
+
     title: {
       fontFamily: fonts.display,
       fontSize: fontSize["3xl"],
       color: colors.onSurface,
     },
+
     card: {
       marginHorizontal: spacing.xl,
-      backgroundColor: colors.surfaceSecondary,
+      backgroundColor:
+        colors.surfaceSecondary,
       borderRadius: radius.lg,
       borderWidth:
         Platform.OS === "android"
@@ -596,6 +690,7 @@ const makeStyles = (colors: any) =>
       borderColor: colors.border,
       overflow: "hidden",
     },
+
     footer: {
       textAlign: "center",
       color: colors.brand,
