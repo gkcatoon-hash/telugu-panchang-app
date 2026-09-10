@@ -20,6 +20,8 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
+          packager: npm
+          eas-cache: false
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK
