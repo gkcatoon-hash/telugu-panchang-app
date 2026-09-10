@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PRESET_CITIES, useLocation } from "@/src/data/LocationContext";
-import { useLang } from "@/src/i18n/LanguageContext";
+import { Language, useLang } from "@/src/i18n/LanguageContext";
 import { useTheme } from "@/src/theme/ThemeContext";
 import { useTabBarBottomPadding } from "@/src/hooks/use-tabbar-inset";
 import { fonts, fontSize, radius, spacing } from "@/src/theme/tokens";
@@ -51,26 +51,29 @@ export default function SettingsScreen() {
   const toggleNotif = async (next: boolean) => {
     Haptics.selectionAsync().catch(() => {});
     setNotifEnabled(next);
+
     AsyncStorage.setItem(NOTIF_KEY, next ? "1" : "0").catch(() => {});
+
     try {
       if (next) {
         const perm = await Notifications.getPermissionsAsync();
+
         if (perm.status !== "granted") {
           const req = await Notifications.requestPermissionsAsync();
+
           if (req.status !== "granted") {
             setNotifEnabled(false);
             AsyncStorage.setItem(NOTIF_KEY, "0").catch(() => {});
             return;
           }
         }
+
         await Notifications.cancelAllScheduledNotificationsAsync();
+
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: lang === "te" ? "నేటి పంచాంగం" : "Today's Panchang",
-            body:
-              lang === "te"
-                ? "నేటి తిథి, నక్షత్రం మరియు శుభ ముహూర్తాలను చూడండి."
-                : "Check today's Tithi, Nakshatram and auspicious timings.",
+            title: t("notification_title"),
+            body: t("notification_body"),
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
@@ -83,8 +86,23 @@ export default function SettingsScreen() {
         await Notifications.cancelAllScheduledNotificationsAsync();
       }
     } catch (e) {
-      // Silently handle Expo Go limitations
       console.log("Notification setup skipped:", e);
+    }
+  };
+
+  const getLanguageLabel = () => {
+    switch (lang) {
+      case "te":
+        return t("telugu");
+      case "hi":
+        return t("hindi");
+      case "ta":
+        return t("tamil");
+      case "kn":
+        return t("kannada");
+      case "en":
+      default:
+        return t("english");
     }
   };
 
@@ -92,13 +110,19 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: bottomPad }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>{t("tab_settings")}</Text>
         </View>
 
         {/* Appearance */}
-        <SectionLabel colors={colors}>{t("appearance")}</SectionLabel>
+        <SectionLabel colors={colors}>
+          {t("appearance")}
+        </SectionLabel>
+
         <View style={styles.card}>
           <Row
             colors={colors}
@@ -108,18 +132,25 @@ export default function SettingsScreen() {
               <Switch
                 value={isDark}
                 onValueChange={toggleTheme}
-                trackColor={{ true: colors.brand, false: colors.borderStrong }}
-                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+                trackColor={{
+                  true: colors.brand,
+                  false: colors.borderStrong,
+                }}
+                thumbColor={
+                  Platform.OS === "android" ? "#fff" : undefined
+                }
                 testID="settings-dark-mode-switch"
               />
             }
           />
+
           <Divider colors={colors} />
+
           <Row
             colors={colors}
             icon="language-outline"
             label={t("language")}
-            value={lang === "te" ? t("telugu") : t("english")}
+            value={getLanguageLabel()}
             onPress={() => {
               Haptics.selectionAsync().catch(() => {});
               setShowLangSheet(true);
@@ -130,7 +161,10 @@ export default function SettingsScreen() {
         </View>
 
         {/* Notifications */}
-        <SectionLabel colors={colors}>{t("notifications")}</SectionLabel>
+        <SectionLabel colors={colors}>
+          {t("notifications")}
+        </SectionLabel>
+
         <View style={styles.card}>
           <Row
             colors={colors}
@@ -141,8 +175,13 @@ export default function SettingsScreen() {
               <Switch
                 value={notifEnabled}
                 onValueChange={toggleNotif}
-                trackColor={{ true: colors.brand, false: colors.borderStrong }}
-                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+                trackColor={{
+                  true: colors.brand,
+                  false: colors.borderStrong,
+                }}
+                thumbColor={
+                  Platform.OS === "android" ? "#fff" : undefined
+                }
                 testID="settings-notif-switch"
               />
             }
@@ -150,7 +189,10 @@ export default function SettingsScreen() {
         </View>
 
         {/* Location */}
-        <SectionLabel colors={colors}>{t("location")}</SectionLabel>
+        <SectionLabel colors={colors}>
+          {t("location")}
+        </SectionLabel>
+
         <View style={styles.card}>
           <Row
             colors={colors}
@@ -167,15 +209,30 @@ export default function SettingsScreen() {
         </View>
 
         {/* About */}
-        <SectionLabel colors={colors}>{t("about")}</SectionLabel>
+        <SectionLabel colors={colors}>
+          {t("about")}
+        </SectionLabel>
+
         <View style={styles.card}>
-          <Row colors={colors} icon="information-circle-outline" label={t("version")} value="1.0.0" />
+          <Row
+            colors={colors}
+            icon="information-circle-outline"
+            label={t("version")}
+            value="2.0.0"
+          />
+
           <Divider colors={colors} />
-          <Row colors={colors} icon="heart-outline" label={t("appName")} subtitle={t("appTagline")} />
+
+          <Row
+            colors={colors}
+            icon="heart-outline"
+            label={t("appName")}
+            subtitle={t("appTagline")}
+          />
         </View>
 
         <Text style={styles.footer}>
-          {lang === "te" ? "శ్రీ మాత్రే నమః" : "Om Namah Shivaya"}
+          {t("footer_mantra")}
         </Text>
       </ScrollView>
 
@@ -188,24 +245,36 @@ export default function SettingsScreen() {
         options={[
           { key: "en", label: t("english") },
           { key: "te", label: t("telugu") },
+          { key: "hi", label: t("hindi") },
+          { key: "ta", label: t("tamil") },
+          { key: "kn", label: t("kannada") },
         ]}
         selectedKey={lang}
         onSelect={(k) => {
-          setLang(k as any);
+          setLang(k as Language);
           setShowLangSheet(false);
         }}
         testIDPrefix="lang-option"
       />
+
+      {/* Location picker */}
       <PickerModal
         visible={showLocSheet}
         title={t("location")}
         colors={colors}
         onClose={() => setShowLocSheet(false)}
-        options={PRESET_CITIES.map((c) => ({ key: c.name, label: c.name }))}
+        options={PRESET_CITIES.map((c) => ({
+          key: c.name,
+          label: c.name,
+        }))}
         selectedKey={location.name}
         onSelect={(k) => {
           const c = PRESET_CITIES.find((x) => x.name === k);
-          if (c) setLocation(c);
+
+          if (c) {
+            setLocation(c);
+          }
+
           setShowLocSheet(false);
         }}
         testIDPrefix="loc-option"
@@ -214,7 +283,13 @@ export default function SettingsScreen() {
   );
 }
 
-function SectionLabel({ children, colors }: { children: React.ReactNode; colors: any }) {
+function SectionLabel({
+  children,
+  colors,
+}: {
+  children: React.ReactNode;
+  colors: any;
+}) {
   return (
     <Text
       style={{
@@ -256,37 +331,93 @@ function Row({
 }) {
   const content = (
     <View style={rowStyles.row}>
-      <View style={[rowStyles.iconWrap, { backgroundColor: colors.brandTertiary }]}>
-        <Ionicons name={icon} size={18} color={colors.brand} />
+      <View
+        style={[
+          rowStyles.iconWrap,
+          { backgroundColor: colors.brandTertiary },
+        ]}
+      >
+        <Ionicons
+          name={icon}
+          size={18}
+          color={colors.brand}
+        />
       </View>
+
       <View style={{ flex: 1 }}>
-        <Text style={{ color: colors.onSurfaceSecondary, fontSize: fontSize.lg, fontFamily: fonts.text, fontWeight: "600" }}>
+        <Text
+          style={{
+            color: colors.onSurfaceSecondary,
+            fontSize: fontSize.lg,
+            fontFamily: fonts.text,
+            fontWeight: "600",
+          }}
+        >
           {label}
         </Text>
+
         {subtitle ? (
-          <Text style={{ color: colors.onSurfaceTertiary, fontSize: fontSize.sm, marginTop: 2 }}>{subtitle}</Text>
+          <Text
+            style={{
+              color: colors.onSurfaceTertiary,
+              fontSize: fontSize.sm,
+              marginTop: 2,
+            }}
+          >
+            {subtitle}
+          </Text>
         ) : null}
       </View>
+
       {value ? (
-        <Text style={{ color: colors.onSurfaceTertiary, fontSize: fontSize.base, marginRight: chevron ? spacing.xs : 0 }}>
+        <Text
+          style={{
+            color: colors.onSurfaceTertiary,
+            fontSize: fontSize.base,
+            marginRight: chevron ? spacing.xs : 0,
+          }}
+        >
           {value}
         </Text>
       ) : null}
+
       {right}
-      {chevron && <Ionicons name="chevron-forward" size={18} color={colors.onSurfaceTertiary} />}
+
+      {chevron && (
+        <Ionicons
+          name="chevron-forward"
+          size={18}
+          color={colors.onSurfaceTertiary}
+        />
+      )}
     </View>
   );
-  if (onPress)
+
+  if (onPress) {
     return (
-      <Pressable onPress={onPress} testID={testID} android_ripple={{ color: colors.divider }}>
+      <Pressable
+        onPress={onPress}
+        testID={testID}
+        android_ripple={{ color: colors.divider }}
+      >
         {content}
       </Pressable>
     );
+  }
+
   return <View testID={testID}>{content}</View>;
 }
 
 function Divider({ colors }: { colors: any }) {
-  return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: colors.divider, marginLeft: spacing.xl + 36 }} />;
+  return (
+    <View
+      style={{
+        height: StyleSheet.hairlineWidth,
+        backgroundColor: colors.divider,
+        marginLeft: spacing.xl + 36,
+      }}
+    />
+  );
 }
 
 function PickerModal({
@@ -309,15 +440,39 @@ function PickerModal({
   testIDPrefix: string;
 }) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={modalStyles.backdrop} onPress={onClose}>
-        <Pressable style={[modalStyles.sheet, { backgroundColor: colors.surfaceSecondary }]}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable
+        style={modalStyles.backdrop}
+        onPress={onClose}
+      >
+        <Pressable
+          style={[
+            modalStyles.sheet,
+            { backgroundColor: colors.surfaceSecondary },
+          ]}
+        >
           <View style={modalStyles.handle} />
-          <Text style={[modalStyles.title, { color: colors.onSurfaceSecondary, fontFamily: fonts.display }]}>
+
+          <Text
+            style={[
+              modalStyles.title,
+              {
+                color: colors.onSurfaceSecondary,
+                fontFamily: fonts.display,
+              },
+            ]}
+          >
             {title}
           </Text>
+
           {options.map((o) => {
             const selected = selectedKey === o.key;
+
             return (
               <Pressable
                 key={o.key}
@@ -328,14 +483,31 @@ function PickerModal({
                 style={[
                   modalStyles.option,
                   { borderColor: colors.border },
-                  selected && { borderColor: colors.brand, backgroundColor: "rgba(212,175,55,0.10)" },
+                  selected && {
+                    borderColor: colors.brand,
+                    backgroundColor:
+                      "rgba(212,175,55,0.10)",
+                  },
                 ]}
                 testID={`${testIDPrefix}-${o.key}`}
               >
-                <Text style={{ color: colors.onSurfaceSecondary, fontSize: fontSize.lg, fontWeight: "600" }}>
+                <Text
+                  style={{
+                    color: colors.onSurfaceSecondary,
+                    fontSize: fontSize.lg,
+                    fontWeight: "600",
+                  }}
+                >
                   {o.label}
                 </Text>
-                {selected && <Ionicons name="checkmark-circle" size={20} color={colors.brand} />}
+
+                {selected && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color={colors.brand}
+                  />
+                )}
               </Pressable>
             );
           })}
@@ -382,7 +554,10 @@ const modalStyles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: spacing.lg,
   },
-  title: { fontSize: fontSize.xl, marginBottom: spacing.lg },
+  title: {
+    fontSize: fontSize.xl,
+    marginBottom: spacing.lg,
+  },
   option: {
     flexDirection: "row",
     alignItems: "center",
@@ -397,14 +572,27 @@ const modalStyles = StyleSheet.create({
 
 const makeStyles = (colors: any) =>
   StyleSheet.create({
-    root: { flex: 1, backgroundColor: colors.surface },
-    header: { paddingHorizontal: spacing.xl, paddingVertical: spacing.lg },
-    title: { fontFamily: fonts.display, fontSize: fontSize["3xl"], color: colors.onSurface },
+    root: {
+      flex: 1,
+      backgroundColor: colors.surface,
+    },
+    header: {
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.lg,
+    },
+    title: {
+      fontFamily: fonts.display,
+      fontSize: fontSize["3xl"],
+      color: colors.onSurface,
+    },
     card: {
       marginHorizontal: spacing.xl,
       backgroundColor: colors.surfaceSecondary,
       borderRadius: radius.lg,
-      borderWidth: Platform.OS === "android" ? StyleSheet.hairlineWidth : 0,
+      borderWidth:
+        Platform.OS === "android"
+          ? StyleSheet.hairlineWidth
+          : 0,
       borderColor: colors.border,
       overflow: "hidden",
     },
