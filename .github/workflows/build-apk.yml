@@ -24,6 +24,10 @@ jobs:
           eas-cache: false
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Install project dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+
       - name: Build Android APK
         working-directory: frontend
         run: eas build --platform android --profile preview --non-interactive --wait
