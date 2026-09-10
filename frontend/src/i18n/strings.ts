@@ -2,7 +2,7 @@
 
 export const strings = {
   // App
-  appName: { en: "ManaLife", te: "మన లైఫ్" },
+  appName: { en: "GKVG Calendar", te: "GKVG క్యాలెండర్" },
   appTagline: { en: "Telugu Panchang & Devotion", te: "తెలుగు పంచాంగం & భక్తి" },
 
   // Tabs
@@ -41,15 +41,27 @@ export const strings = {
   krishna: { en: "Krishna Paksha", te: "కృష్ణ పక్షం" },
 
   // Calendar
-  select_a_date: { en: "Select a date to view details", te: "వివరాలు చూడటానికి తేదీ ఎంచుకోండి" },
-  no_festival_today: { en: "No festival on this day", te: "ఈ రోజు పండుగ లేదు" },
+  select_a_date: {
+    en: "Select a date to view details",
+    te: "వివరాలు చూడటానికి తేదీ ఎంచుకోండి",
+  },
+  no_festival_today: {
+    en: "No festival on this day",
+    te: "ఈ రోజు పండుగ లేదు",
+  },
 
   // Festivals
-  upcoming_festivals: { en: "Upcoming Festivals", te: "రాబోయే పండుగలు" },
+  upcoming_festivals: {
+    en: "Upcoming Festivals",
+    te: "రాబోయే పండుగలు",
+  },
   vratham: { en: "Vratham", te: "వ్రతం" },
   festival: { en: "Festival", te: "పండుగ" },
   observance: { en: "Observance", te: "అనుష్ఠానం" },
-  no_festivals: { en: "No upcoming festivals", te: "రాబోయే పండుగలు లేవు" },
+  no_festivals: {
+    en: "No upcoming festivals",
+    te: "రాబోయే పండుగలు లేవు",
+  },
 
   // Devotion
   daily_sloka: { en: "Daily Sloka", te: "నిత్య శ్లోకం" },
@@ -63,8 +75,14 @@ export const strings = {
   language: { en: "Language", te: "భాష" },
   english: { en: "English", te: "ఇంగ్లీష్" },
   telugu: { en: "Telugu", te: "తెలుగు" },
-  notifications: { en: "Daily Notifications", te: "నిత్య నోటిఫికేషన్‌లు" },
-  notifications_desc: { en: "Get today's Panchang each morning", te: "ప్రతి ఉదయం నేటి పంచాంగం అందుకోండి" },
+  notifications: {
+    en: "Daily Notifications",
+    te: "నిత్య నోటిఫికేషన్‌లు",
+  },
+  notifications_desc: {
+    en: "Get today's Panchang each morning",
+    te: "ప్రతి ఉదయం నేటి పంచాంగం అందుకోండి",
+  },
   location: { en: "Location", te: "ప్రదేశం" },
   about: { en: "About", te: "గురించి" },
   version: { en: "Version", te: "వెర్షన్" },
